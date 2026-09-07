@@ -56,39 +56,24 @@
     cursor:pointer;
   }
   .primary{
-    background:var(--gold);
-    color:white;
+    background:white;
+    color:var(--brown);
+    border:1px solid #d9d9d9;
   }
   .micButton{
-    width:58px;
+    width:auto;
+    min-width:58px;
     height:58px;
-    padding:0;
-    border-radius:50%;
+    padding:0 22px;
+    border-radius:12px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    font-size:26px;
+    font-size:30px;
     position:relative;
   }
-  .micButton[aria-label]::after{
-    content:attr(aria-label);
-    position:absolute;
-    left:50%;
-    top:calc(100% + 8px);
-    transform:translateX(-50%);
-    background:#333;
-    color:#fff;
-    padding:5px 8px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:400;
-    white-space:nowrap;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .15s;
-  }
-  .micButton[aria-label]:hover::after{
-    opacity:1;
+  .micButton:hover{
+    background:#fafafa;
   }
   .secondary{
     background:white;
@@ -125,7 +110,12 @@
         type="button"
         aria-label="Enregistrer"
         title="Enregistrer"
-      >🎙️</button>
+      ><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg></button>
 
       <label for="fileInput" class="fileLabel secondary">
         📁 Déposer un fichier audio
@@ -258,7 +248,12 @@ recordBtn.addEventListener("click", async () => {
 
       showAudio(blob,"Enregistrement terminé");
 
-      recordBtn.textContent = "🎙️";
+      recordBtn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`;
       recordBtn.setAttribute("aria-label", "Enregistrer à nouveau");
       recordBtn.setAttribute("title", "Enregistrer à nouveau");
       resetTimer();
@@ -277,7 +272,12 @@ recordBtn.addEventListener("click", async () => {
       resetTimer();
 
       alert("Une erreur est survenue pendant l'enregistrement.");
-      recordBtn.textContent = "🎙️";
+      recordBtn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`;
       recordBtn.setAttribute("aria-label", "Enregistrer");
       recordBtn.setAttribute("title", "Enregistrer");
     };
@@ -286,7 +286,7 @@ recordBtn.addEventListener("click", async () => {
 
     startTimer();
 
-    recordBtn.textContent = "⏹️";
+    recordBtn.innerHTML = "⏹️";
     recordBtn.setAttribute("aria-label", "Arrêter");
     recordBtn.setAttribute("title", "Arrêter");
 
