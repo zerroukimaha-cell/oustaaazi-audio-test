@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Enregistrez-vous ou déposez un fichier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enregistrement Oustaazi</title>
 <style>
   :root{
     --gold:#b89146;
@@ -11,7 +11,9 @@
     --cream:#f7f2e8;
     --white:#fff;
   }
+
   *{box-sizing:border-box}
+
   body{
     margin:0;
     min-height:100vh;
@@ -23,150 +25,253 @@
     justify-content:center;
     padding:24px;
   }
+
   .card{
     width:min(680px,100%);
     background:var(--white);
     border-radius:22px;
-    padding:28px;
+    padding:34px 30px;
     box-shadow:0 12px 40px rgba(70,50,20,.12);
+    text-align:center;
   }
+
   h1{
-    margin:0 0 22px;
-    font-size:26px;
+    margin:0;
+    font-size:27px;
+    line-height:1.25;
   }
+
   .timer{
+    display:none;
+    margin:24px 0 18px;
     font-size:42px;
     font-weight:700;
-    text-align:center;
-    margin:18px 0;
-    display:none;
   }
-  .actions{
+
+  .mic-area{
     display:flex;
-    gap:12px;
-    flex-wrap:wrap;
     justify-content:center;
+    margin-top:30px;
   }
-  button,.fileLabel{
-    border:0;
-    border-radius:12px;
-    padding:14px 18px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-  }
-  .primary{
-    background:white;
-    color:var(--brown);
-    border:1px solid #d9d9d9;
-  }
-  .micButton{
-    width:auto;
-    min-width:58px;
-    height:58px;
-    padding:0 22px;
-    border-radius:12px;
-    display:inline-flex;
+
+  .mic-button{
+    width:82px;
+    height:82px;
+    border:1px solid #d6d6d6;
+    background:#fff;
+    border-radius:14px;
+    display:flex;
     align-items:center;
     justify-content:center;
-    font-size:30px;
-    position:relative;
+    cursor:pointer;
+    color:#222;
+    transition:transform .15s, background .15s;
   }
-  .micButton:hover{
+
+  .mic-button:hover{
+    background:#fafafa;
+    transform:translateY(-1px);
+  }
+
+  .mic-button:active{
+    transform:translateY(0);
+  }
+
+  .mic-button svg{
+    width:38px;
+    height:38px;
+  }
+
+  .waveform{
+    height:90px;
+    margin:12px auto 0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    overflow:hidden;
+    max-width:560px;
+  }
+
+  .bar{
+    width:4px;
+    height:14px;
+    background:#555;
+    border-radius:999px;
+    transition:height .06s ease;
+  }
+
+  .controls{
+    display:none;
+    margin-top:22px;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+
+  .round-action{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    border:1px solid #d6d6d6;
+    background:#fff;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+  }
+
+  .round-action:hover{
     background:#fafafa;
   }
-  .secondary{
-    background:white;
-    color:var(--brown);
-    border:1px solid #ddd;
+
+  .confirm{
+    border-color:#d6d6d6;
   }
-  .danger{
-    background:#eee;
-    color:#333;
+
+  .record-again{
+    display:none;
+    margin-top:18px;
+    border:0;
+    background:transparent;
+    color:#666;
+    cursor:pointer;
+    font-size:14px;
   }
-  #fileInput{display:none}
+
   audio{
     width:100%;
-    margin-top:18px;
+    max-width:560px;
+    margin:20px auto 0;
     display:none;
   }
-  .selected{
-    margin-top:14px;
-    color:#666;
-    display:none;
+
+  .hint{
+    margin-top:18px;
+    color:#777;
+    font-size:14px;
   }
 </style>
 </head>
+
 <body>
-  <main class="card">
-    <h1>🎙️ Enregistrez-vous ou déposez un fichier</h1>
 
-    <div id="timer" class="timer">00:00</div>
+<main class="card">
 
-    <div class="actions">
-      <button
-        id="recordBtn"
-        class="primary micButton"
-        type="button"
-        aria-label="Enregistrer"
-        title="Enregistrer"
-      ><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
-<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-</svg></button>
+  <h1>🎙️ Cliquez pour vous enregistrer</h1>
 
-      <label for="fileInput" class="fileLabel secondary">
-        📁 Déposer un fichier audio
-      </label>
-      <input id="fileInput" type="file" accept="audio/*">
-    </div>
+  <div id="timer" class="timer">00:00</div>
 
-    <audio id="player" controls></audio>
+  <div class="mic-area">
+    <button
+      id="micButton"
+      class="mic-button"
+      type="button"
+      aria-label="Démarrer l'enregistrement"
+      title="Démarrer l'enregistrement"
+    >
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 18V21"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M9 21H15"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
 
-    <div id="selected" class="selected"></div>
+  <div id="waveform" class="waveform"></div>
 
-    <div class="actions" style="margin-top:14px">
-      <button id="deleteBtn" class="danger" style="display:none">
-        🗑️ Supprimer
-      </button>
-    </div>
-  </main>
+  <audio id="player" controls></audio>
+
+  <div id="controls" class="controls">
+    <button
+      id="deleteButton"
+      class="round-action"
+      type="button"
+      aria-label="Supprimer et recommencer"
+      title="Supprimer et recommencer"
+    >
+      ✕
+    </button>
+
+    <button
+      id="confirmButton"
+      class="round-action confirm"
+      type="button"
+      aria-label="Utiliser cet enregistrement"
+      title="Utiliser cet enregistrement"
+    >
+      ✓
+    </button>
+  </div>
+
+  <button
+    id="againButton"
+    class="record-again"
+    type="button"
+  >
+    🎙️ Refaire l'enregistrement
+  </button>
+
+  <div id="hint" class="hint"></div>
+
+</main>
 
 <script>
 let recorder = null;
-let chunks = [];
 let stream = null;
-let timerInterval = null;
-let seconds = 0;
+let chunks = [];
+let currentBlob = null;
 let currentUrl = null;
 
-const recordBtn = document.getElementById("recordBtn");
-const fileInput = document.getElementById("fileInput");
-const player = document.getElementById("player");
-const selected = document.getElementById("selected");
-const deleteBtn = document.getElementById("deleteBtn");
-const timer = document.getElementById("timer");
+let audioContext = null;
+let analyser = null;
+let sourceNode = null;
+let animationFrame = null;
 
-function resetTimer(){
-  clearInterval(timerInterval);
-  seconds = 0;
-  timer.textContent = "00:00";
-  timer.style.display = "none";
+let timerInterval = null;
+let elapsedSeconds = 0;
+
+const micButton = document.getElementById("micButton");
+const timer = document.getElementById("timer");
+const waveform = document.getElementById("waveform");
+const player = document.getElementById("player");
+const controls = document.getElementById("controls");
+const deleteButton = document.getElementById("deleteButton");
+const confirmButton = document.getElementById("confirmButton");
+const againButton = document.getElementById("againButton");
+const hint = document.getElementById("hint");
+
+const bars = [];
+
+for(let i = 0; i < 55; i++){
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  waveform.appendChild(bar);
+  bars.push(bar);
+}
+
+function formatTime(seconds){
+  const minutes = String(Math.floor(seconds / 60)).padStart(2,"0");
+  const secs = String(seconds % 60).padStart(2,"0");
+  return minutes + ":" + secs;
 }
 
 function startTimer(){
-  seconds = 0;
+  elapsedSeconds = 0;
   timer.textContent = "00:00";
   timer.style.display = "block";
 
   clearInterval(timerInterval);
+
   timerInterval = setInterval(() => {
-    seconds++;
-    const m = String(Math.floor(seconds/60)).padStart(2,"0");
-    const s = String(seconds%60).padStart(2,"0");
-    timer.textContent = `${m}:${s}`;
+    elapsedSeconds++;
+    timer.textContent = formatTime(elapsedSeconds);
   },1000);
 }
 
@@ -174,37 +279,167 @@ function stopTimer(){
   clearInterval(timerInterval);
 }
 
-function showAudio(blob, label){
-  if(currentUrl) URL.revokeObjectURL(currentUrl);
-
-  currentUrl = URL.createObjectURL(blob);
-  player.src = currentUrl;
-  player.style.display = "block";
-
-  selected.textContent = "✅ " + label;
-  selected.style.display = "block";
-
-  deleteBtn.style.display = "inline-block";
+function resetWaveform(){
+  bars.forEach(bar => {
+    bar.style.height = "14px";
+  });
 }
 
-recordBtn.addEventListener("click", async () => {
+function stopVisualization(){
 
-  if (recorder && recorder.state === "recording"){
-    recorder.stop();
-    return;
+  if(animationFrame){
+    cancelAnimationFrame(animationFrame);
+    animationFrame = null;
   }
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    alert("Le microphone n'est pas disponible dans ce navigateur.");
+  resetWaveform();
+
+  if(audioContext){
+    audioContext.close().catch(() => {});
+    audioContext = null;
+  }
+
+  analyser = null;
+  sourceNode = null;
+}
+
+function startVisualization(){
+
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.65;
+
+  sourceNode =
+    audioContext.createMediaStreamSource(stream);
+
+  sourceNode.connect(analyser);
+
+  const data =
+    new Uint8Array(
+      analyser.frequencyBinCount
+    );
+
+  waveform.style.display = "flex";
+
+  function draw(){
+
+    if(!analyser){
+      return;
+    }
+
+    analyser.getByteTimeDomainData(data);
+
+    for(let i = 0; i < bars.length; i++){
+
+      const index =
+        Math.floor(
+          i * data.length / bars.length
+        );
+
+      const value =
+        Math.abs(
+          data[index] - 128
+        );
+
+      const height =
+        Math.max(
+          14,
+          Math.min(
+            76,
+            14 + value * 2.8
+          )
+        );
+
+      bars[i].style.height =
+        height + "px";
+    }
+
+    animationFrame =
+      requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+function resetInterface(){
+
+  stopVisualization();
+  stopTimer();
+
+  timer.style.display = "none";
+  waveform.style.display = "none";
+
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  player.style.display = "none";
+
+  controls.style.display = "none";
+  againButton.style.display = "none";
+
+  resetWaveform();
+
+  if(currentUrl){
+    URL.revokeObjectURL(currentUrl);
+    currentUrl = null;
+  }
+
+  currentBlob = null;
+  chunks = [];
+
+  micButton.style.display = "flex";
+  micButton.disabled = false;
+  micButton.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+      <rect x="9" y="3" width="6" height="12" rx="3"
+            stroke="currentColor" stroke-width="1.8"/>
+      <path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M12 18V21"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M9 21H15"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  `;
+
+  micButton.setAttribute(
+    "aria-label",
+    "Démarrer l'enregistrement"
+  );
+
+  micButton.setAttribute(
+    "title",
+    "Démarrer l'enregistrement"
+  );
+
+  hint.textContent = "";
+}
+
+async function startRecording(){
+
+  if(!navigator.mediaDevices ||
+     !navigator.mediaDevices.getUserMedia){
+
+    alert(
+      "Le microphone n'est pas disponible dans ce navigateur."
+    );
+
     return;
   }
 
   try{
-    stream = await navigator.mediaDevices.getUserMedia({audio:true});
+
+    stream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:true
+      });
 
     chunks = [];
 
-    const preferred = [
+    const preferredTypes = [
       "audio/webm;codecs=opus",
       "audio/webm",
       "audio/mp4"
@@ -212,156 +447,265 @@ recordBtn.addEventListener("click", async () => {
 
     let mimeType = "";
 
-    for(const type of preferred){
+    for(const type of preferredTypes){
+
       if(
         window.MediaRecorder &&
         MediaRecorder.isTypeSupported &&
         MediaRecorder.isTypeSupported(type)
       ){
+
         mimeType = type;
         break;
+
       }
     }
 
-    recorder = mimeType
-      ? new MediaRecorder(stream,{mimeType})
-      : new MediaRecorder(stream);
+    recorder =
+      mimeType
+        ? new MediaRecorder(
+            stream,
+            { mimeType }
+          )
+        : new MediaRecorder(stream);
 
-    recorder.ondataavailable = e => {
-      if(e.data && e.data.size > 0){
-        chunks.push(e.data);
-      }
-    };
+    recorder.ondataavailable =
+      event => {
 
-    recorder.onstop = () => {
+        if(
+          event.data &&
+          event.data.size > 0
+        ){
 
-      stopTimer();
+          chunks.push(
+            event.data
+          );
 
-      if(stream){
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
+        }
 
-      const blob = new Blob(chunks,{
-        type: recorder.mimeType || "audio/webm"
-      });
+      };
 
-      showAudio(blob,"Enregistrement terminé");
+    recorder.onstop =
+      () => {
 
-      recordBtn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
-<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-</svg>`;
-      recordBtn.setAttribute("aria-label", "Enregistrer à nouveau");
-      recordBtn.setAttribute("title", "Enregistrer à nouveau");
-      resetTimer();
-    };
+        stopTimer();
+        stopVisualization();
 
-    recorder.onerror = e => {
-      console.error(e);
+        if(stream){
 
-      stopTimer();
+          stream
+            .getTracks()
+            .forEach(
+              track => track.stop()
+            );
 
-      if(stream){
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
+          stream = null;
 
-      resetTimer();
+        }
 
-      alert("Une erreur est survenue pendant l'enregistrement.");
-      recordBtn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
-<path d="M6 11V12C6 15.314 8.686 18 12 18C15.314 18 18 15.314 18 12V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M12 18V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-</svg>`;
-      recordBtn.setAttribute("aria-label", "Enregistrer");
-      recordBtn.setAttribute("title", "Enregistrer");
-    };
+        currentBlob =
+          new Blob(
+            chunks,
+            {
+              type:
+                recorder.mimeType ||
+                "audio/webm"
+            }
+          );
+
+        if(currentUrl){
+          URL.revokeObjectURL(currentUrl);
+        }
+
+        currentUrl =
+          URL.createObjectURL(
+            currentBlob
+          );
+
+        player.src =
+          currentUrl;
+
+        player.style.display =
+          "block";
+
+        controls.style.display =
+          "flex";
+
+        againButton.style.display =
+          "block";
+
+        timer.style.display =
+          "block";
+
+        hint.textContent =
+          "Écoutez votre enregistrement puis validez s'il vous convient.";
+
+        micButton.style.display =
+          "none";
+      };
 
     recorder.start();
 
     startTimer();
+    startVisualization();
 
-    recordBtn.innerHTML = "⏹️";
-    recordBtn.setAttribute("aria-label", "Arrêter");
-    recordBtn.setAttribute("title", "Arrêter");
+    micButton.innerHTML = "⏹";
+    micButton.setAttribute(
+      "aria-label",
+      "Arrêter l'enregistrement"
+    );
+    micButton.setAttribute(
+      "title",
+      "Arrêter l'enregistrement"
+    );
 
-  }
-  catch(error){
+  }catch(error){
 
     console.error(error);
 
-    if(error.name === "NotAllowedError"){
+    if(
+      error.name === "NotAllowedError"
+    ){
+
       alert(
-        "Le microphone a été refusé. Autorisez le microphone dans votre navigateur puis réessayez."
+        "Le microphone a été refusé. Autorisez le microphone pour cette page puis réessayez."
       );
-    }
-    else if(error.name === "NotFoundError"){
-      alert("Aucun microphone n'a été détecté.");
-    }
-    else if(error.name === "NotReadableError"){
-      alert("Le microphone est utilisé par une autre application.");
-    }
-    else if(error.name === "SecurityError"){
-      alert("Le navigateur bloque l'accès au microphone dans ce contexte.");
-    }
-    else{
+
+    }else if(
+      error.name === "NotFoundError"
+    ){
+
       alert(
-        "Impossible d'accéder au microphone : " + error.name
+        "Aucun microphone n'a été détecté."
       );
+
+    }else if(
+      error.name === "NotReadableError"
+    ){
+
+      alert(
+        "Le microphone est utilisé par une autre application."
+      );
+
+    }else{
+
+      alert(
+        "Impossible d'accéder au microphone."
+      );
+
     }
+
   }
-});
+}
 
-fileInput.addEventListener("change", e => {
+micButton.addEventListener(
+  "click",
+  () => {
 
-  const file =
-    e.target.files && e.target.files[0];
+    if(
+      recorder &&
+      recorder.state === "recording"
+    ){
 
-  if(!file){
-    return;
+      recorder.stop();
+
+    }else{
+
+      startRecording();
+
+    }
+
   }
+);
 
-  if(!file.type.startsWith("audio/")){
-    alert("Veuillez sélectionner un fichier audio.");
-    fileInput.value = "";
-    return;
+deleteButton.addEventListener(
+  "click",
+  () => {
+
+    resetInterface();
+
   }
+);
 
-  showAudio(
-    file,
-    file.name
-  );
-});
+againButton.addEventListener(
+  "click",
+  () => {
 
-deleteBtn.addEventListener("click", () => {
+    resetInterface();
+    startRecording();
 
-  if(currentUrl){
-    URL.revokeObjectURL(currentUrl);
   }
+);
 
-  currentUrl = null;
+confirmButton.addEventListener(
+  "click",
+  () => {
 
-  player.pause();
-  player.removeAttribute("src");
-  player.load();
-  player.style.display = "none";
+    if(!currentBlob){
 
-  selected.textContent = "";
-  selected.style.display = "none";
+      alert(
+        "Aucun enregistrement à valider."
+      );
 
-  deleteBtn.style.display = "none";
+      return;
 
-  fileInput.value = "";
+    }
 
-  recordBtn.textContent = "🎙️ Enregistrer";
+    /*
+     * Communication avec la page Oustaazi
+     * qui a ouvert cette fenêtre.
+     */
+    if(window.opener){
 
-  resetTimer();
-});
+      window.opener.postMessage(
+        {
+          type:
+            "OUSTAAZI_AUDIO_READY",
+
+          audioBlob:
+            currentBlob
+        },
+        "*"
+      );
+
+      hint.textContent =
+        "✅ Enregistrement transmis à Oustaazi.";
+
+      setTimeout(
+        () => window.close(),
+        400
+      );
+
+    }else{
+
+      hint.textContent =
+        "Enregistrement validé.";
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    stopVisualization();
+    stopTimer();
+
+    if(stream){
+
+      stream
+        .getTracks()
+        .forEach(
+          track => track.stop()
+        );
+
+    }
+
+  }
+);
 </script>
+
 </body>
 </html>
