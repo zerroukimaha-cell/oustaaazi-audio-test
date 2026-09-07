@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Oustaazi — Test enregistrement audio</title>
+<title>Enregistrez-vous ou déposez un fichier</title>
 <style>
   :root{
     --gold:#b89146;
@@ -31,25 +31,15 @@
     box-shadow:0 12px 40px rgba(70,50,20,.12);
   }
   h1{
-    margin:0 0 8px;
+    margin:0 0 22px;
     font-size:26px;
-  }
-  .sub{
-    margin:0 0 24px;
-    color:#777;
-  }
-  .status{
-    margin:0 0 18px;
-    padding:14px 16px;
-    border-radius:12px;
-    background:#f5f5f5;
-    line-height:1.4;
   }
   .timer{
     font-size:42px;
     font-weight:700;
     text-align:center;
     margin:18px 0;
+    display:none;
   }
   .actions{
     display:flex;
@@ -68,6 +58,37 @@
   .primary{
     background:var(--gold);
     color:white;
+  }
+  .micButton{
+    width:58px;
+    height:58px;
+    padding:0;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    position:relative;
+  }
+  .micButton[aria-label]::after{
+    content:attr(aria-label);
+    position:absolute;
+    left:50%;
+    top:calc(100% + 8px);
+    transform:translateX(-50%);
+    background:#333;
+    color:#fff;
+    padding:5px 8px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:400;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s;
+  }
+  .micButton[aria-label]:hover::after{
+    opacity:1;
   }
   .secondary{
     background:white;
@@ -89,26 +110,22 @@
     color:#666;
     display:none;
   }
-  .small{
-    margin-top:18px;
-    font-size:13px;
-    color:#777;
-  }
 </style>
 </head>
 <body>
   <main class="card">
-    <h1>🎙️ Test enregistrement audio</h1>
-    <p class="sub">Prototype de l'enregistreur Oustaazi</p>
-
-    <div id="status" class="status">
-      Prêt à enregistrer.
-    </div>
+    <h1>🎙️ Enregistrez-vous ou déposez un fichier</h1>
 
     <div id="timer" class="timer">00:00</div>
 
     <div class="actions">
-      <button id="recordBtn" class="primary">🎙️ Enregistrer</button>
+      <button
+        id="recordBtn"
+        class="primary micButton"
+        type="button"
+        aria-label="Enregistrer"
+        title="Enregistrer"
+      >🎙️</button>
 
       <label for="fileInput" class="fileLabel secondary">
         📁 Déposer un fichier audio
@@ -125,10 +142,6 @@
         🗑️ Supprimer
       </button>
     </div>
-
-    <div class="small">
-      Ce prototype sert uniquement à tester le microphone. Rien n'est envoyé dans Google Drive.
-    </div>
   </main>
 
 <script>
@@ -144,21 +157,21 @@ const fileInput = document.getElementById("fileInput");
 const player = document.getElementById("player");
 const selected = document.getElementById("selected");
 const deleteBtn = document.getElementById("deleteBtn");
-const status = document.getElementById("status");
 const timer = document.getElementById("timer");
-
-function setStatus(text){
-  status.textContent = text;
-}
 
 function resetTimer(){
   clearInterval(timerInterval);
   seconds = 0;
   timer.textContent = "00:00";
+  timer.style.display = "none";
 }
 
 function startTimer(){
-  resetTimer();
+  seconds = 0;
+  timer.textContent = "00:00";
+  timer.style.display = "block";
+
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     seconds++;
     const m = String(Math.floor(seconds/60)).padStart(2,"0");
@@ -173,22 +186,26 @@ function stopTimer(){
 
 function showAudio(blob, label){
   if(currentUrl) URL.revokeObjectURL(currentUrl);
+
   currentUrl = URL.createObjectURL(blob);
   player.src = currentUrl;
   player.style.display = "block";
+
   selected.textContent = "✅ " + label;
   selected.style.display = "block";
+
   deleteBtn.style.display = "inline-block";
 }
 
 recordBtn.addEventListener("click", async () => {
+
   if (recorder && recorder.state === "recording"){
     recorder.stop();
     return;
   }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    alert("Le microphone n'est pas disponible dans ce contexte.");
+    alert("Le microphone n'est pas disponible dans ce navigateur.");
     return;
   }
 
@@ -204,10 +221,13 @@ recordBtn.addEventListener("click", async () => {
     ];
 
     let mimeType = "";
+
     for(const type of preferred){
-      if(window.MediaRecorder &&
-         MediaRecorder.isTypeSupported &&
-         MediaRecorder.isTypeSupported(type)){
+      if(
+        window.MediaRecorder &&
+        MediaRecorder.isTypeSupported &&
+        MediaRecorder.isTypeSupported(type)
+      ){
         mimeType = type;
         break;
       }
@@ -218,11 +238,15 @@ recordBtn.addEventListener("click", async () => {
       : new MediaRecorder(stream);
 
     recorder.ondataavailable = e => {
-      if(e.data && e.data.size > 0) chunks.push(e.data);
+      if(e.data && e.data.size > 0){
+        chunks.push(e.data);
+      }
     };
 
     recorder.onstop = () => {
+
       stopTimer();
+
       if(stream){
         stream.getTracks().forEach(track => track.stop());
         stream = null;
@@ -233,45 +257,74 @@ recordBtn.addEventListener("click", async () => {
       });
 
       showAudio(blob,"Enregistrement terminé");
-      recordBtn.textContent = "🎙️ Enregistrer à nouveau";
-      setStatus("Enregistrement terminé. Tu peux l'écouter ou le supprimer.");
+
+      recordBtn.textContent = "🎙️";
+      recordBtn.setAttribute("aria-label", "Enregistrer à nouveau");
+      recordBtn.setAttribute("title", "Enregistrer à nouveau");
+      resetTimer();
     };
 
     recorder.onerror = e => {
       console.error(e);
+
       stopTimer();
-      setStatus("Une erreur est survenue pendant l'enregistrement.");
+
       if(stream){
         stream.getTracks().forEach(track => track.stop());
         stream = null;
       }
+
+      resetTimer();
+
+      alert("Une erreur est survenue pendant l'enregistrement.");
+      recordBtn.textContent = "🎙️";
+      recordBtn.setAttribute("aria-label", "Enregistrer");
+      recordBtn.setAttribute("title", "Enregistrer");
     };
 
     recorder.start();
-    startTimer();
-    recordBtn.textContent = "⏹️ Arrêter";
-    setStatus("🔴 Enregistrement en cours...");
 
-  }catch(error){
+    startTimer();
+
+    recordBtn.textContent = "⏹️";
+    recordBtn.setAttribute("aria-label", "Arrêter");
+    recordBtn.setAttribute("title", "Arrêter");
+
+  }
+  catch(error){
+
     console.error(error);
 
     if(error.name === "NotAllowedError"){
-      alert("Le microphone a été refusé. Autorise le microphone dans ton navigateur puis réessaie.");
-    }else if(error.name === "NotFoundError"){
+      alert(
+        "Le microphone a été refusé. Autorisez le microphone dans votre navigateur puis réessayez."
+      );
+    }
+    else if(error.name === "NotFoundError"){
       alert("Aucun microphone n'a été détecté.");
-    }else if(error.name === "NotReadableError"){
+    }
+    else if(error.name === "NotReadableError"){
       alert("Le microphone est utilisé par une autre application.");
-    }else if(error.name === "SecurityError"){
+    }
+    else if(error.name === "SecurityError"){
       alert("Le navigateur bloque l'accès au microphone dans ce contexte.");
-    }else{
-      alert("Impossible d'accéder au microphone : " + error.name);
+    }
+    else{
+      alert(
+        "Impossible d'accéder au microphone : " + error.name
+      );
     }
   }
 });
 
 fileInput.addEventListener("change", e => {
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
+
+  const file =
+    e.target.files && e.target.files[0];
+
+  if(!file){
+    return;
+  }
 
   if(!file.type.startsWith("audio/")){
     alert("Veuillez sélectionner un fichier audio.");
@@ -279,24 +332,35 @@ fileInput.addEventListener("change", e => {
     return;
   }
 
-  showAudio(file,file.name);
-  setStatus("Fichier audio sélectionné.");
+  showAudio(
+    file,
+    file.name
+  );
 });
 
 deleteBtn.addEventListener("click", () => {
-  if(currentUrl) URL.revokeObjectURL(currentUrl);
+
+  if(currentUrl){
+    URL.revokeObjectURL(currentUrl);
+  }
+
   currentUrl = null;
+
   player.pause();
   player.removeAttribute("src");
   player.load();
   player.style.display = "none";
+
   selected.textContent = "";
   selected.style.display = "none";
+
   deleteBtn.style.display = "none";
+
   fileInput.value = "";
+
   recordBtn.textContent = "🎙️ Enregistrer";
+
   resetTimer();
-  setStatus("Prêt à enregistrer.");
 });
 </script>
 </body>
